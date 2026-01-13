@@ -8,10 +8,16 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
     # DO NOT override username_field
 
     def validate(self, attrs):
-        email = attrs.get("email")
+
+        if attrs.get("email") is None:
+            email = attrs.get("username")
+        else:
+            email = attrs.get("email")
+
         password = attrs.get("password")
 
         if not email or not password:
+            email = attrs.get("email")
             raise AuthenticationFailed("Email and password are required")
 
         # Authenticate using email as username

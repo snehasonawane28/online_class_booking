@@ -10,6 +10,8 @@ urlpatterns = [
     path('login/', LoginAPI.as_view(), name='login'),
     path('register/', RegisterAPI.as_view(), name='register'),
 
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
     # Teacher
     path('teacher/availability/', TeacherAvailabilityAPI.as_view(), name='teacher-availability'),
     path('teacher/bookings/', TeacherBookingsAPI.as_view(), name='teacher-bookings'),

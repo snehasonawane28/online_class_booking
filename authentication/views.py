@@ -71,6 +71,7 @@ class RegisterAPI(APIView):
             phone=data['phone'],
             age=data['age'],
             role=data['role'],
+            subject=data.get('subject', None)
         )
 
         return Response(
@@ -89,7 +90,7 @@ class TeacherAvailabilityAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        if request.user.role != 'teacher':
+        if request.user.role != 'teacher' and request.user.role != 'Teacher':
             return Response({"error": "Only teachers allowed"}, status=403)
 
         data = request.data
@@ -114,10 +115,12 @@ class AvailableSlotsAPI(APIView):
             start = datetime.combine(avail.date, avail.start_time)
             end = datetime.combine(avail.date, avail.end_time)
 
+            subject = TeacherAvailability.objects.get(teacher=avail.teacher).teacher.subject
+
             while start + timedelta(hours=1) <= end:
                 slots.append({
                     "teacher": avail.teacher.email,
-                    "subject": avail.teacher.teacherprofile.subject,
+                    "subject": subject,
                     "start_time": start.time(),
                     "end_time": (start + timedelta(hours=1)).time()
                 })
@@ -149,7 +152,7 @@ class TeacherBookingsAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        if request.user.role != 'teacher':
+        if request.user.role != 'teacher' and request.user.role != 'Teacher':
             return Response({"error": "Only teachers allowed"}, status=403)
 
         bookings = ClassBooking.objects.filter(teacher=request.user)
